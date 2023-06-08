@@ -9,9 +9,7 @@ export default function Home() {
         <meta name="description" content="test task for Brave Developers" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <main>
-        <MainScreen />
-      </main>
+      <MainScreen />
     </>
   );
 }

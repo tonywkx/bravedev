@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
+import Head from "next/head";
 import styled, { keyframes } from "styled-components";
-
-interface PaymentFormProps {
-  operator: string;
-}
+import Alert from "@/components/Alert";
 
 const rotateAnimation = keyframes`
   from {
@@ -25,7 +23,6 @@ const Loader = styled.div`
 `;
 
 const Container = styled.div`
-  font-family: "Montserrat", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -33,10 +30,10 @@ const Container = styled.div`
   height: 100vh;
   z-index: 10;
   position: relative;
+  overflow-x: hidden;
 `;
 
 const BackgroundContainer = styled.div`
-  font-family: "Montserrat", sans-serif;
   font-weight: 600;
   display: flex;
   justify-content: center;
@@ -52,14 +49,12 @@ const BackgroundContainer = styled.div`
 `;
 
 const Title = styled.h1`
-  font-family: "Montserrat", sans-serif;
   font-size: 24px;
   margin-bottom: 20px;
   z-index: 10;
 `;
 
 const PaymentFormStyle = styled.form`
-  font-family: "Montserrat", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -67,7 +62,6 @@ const PaymentFormStyle = styled.form`
 `;
 
 const InputLabel = styled.label`
-  font-family: "Montserrat", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -77,7 +71,6 @@ const InputLabel = styled.label`
 `;
 
 const InputField = styled.input`
-  font-family: "Montserrat", sans-serif;
   width: 300px;
   padding: 10px;
   margin-bottom: 10px;
@@ -87,8 +80,6 @@ const InputField = styled.input`
 `;
 
 const SubmitButton = styled.button`
-  font-family: "Montserrat", sans-serif;
-
   background-color: #f5f5f5;
   transition: 0.3s;
   border: none;
@@ -110,18 +101,12 @@ const SubmitButton = styled.button`
   }
 `;
 
-const Message = styled.p`
-  font-family: "Montserrat", sans-serif;
-  margin-top: 20px;
-  z-index: 10;
-`;
-
-const PaymentForm: React.FC<PaymentFormProps> = () => {
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [amount, setAmount] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState("");
+const PaymentForm: React.FC = () => {
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [amount, setAmount] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSuccess, setIsSuccess] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string>("");
 
   const router = useRouter();
   const { operator } = router.query;
@@ -151,16 +136,16 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
 
     if (random < 0.5) {
       // Случайный успешный ответ API
-      setSuccess(true);
-      setError("");
+      setIsSuccess(true);
+      setErrorMessage("");
       setTimeout(() => router.push("/"), 2000);
     } else {
       // Случайный неуспешный ответ API
-      setError("Произошла ошибка при выполнении платежа");
-      setSuccess(false);
+      setErrorMessage("Произошла ошибка при выполнении платежа");
+      setIsSuccess(false);
     }
 
-    setLoading(false);
+    setIsLoading(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -171,25 +156,27 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
     const validAmount = validateAmount(amount);
 
     if (!validPhone || !validAmount) {
-      setError("Пожалуйста, введите допустимую сумму и правильный номер");
+      setErrorMessage(
+        "Пожалуйста, введите допустимую сумму и правильный номер"
+      );
       return;
     }
 
     if (!phoneNumber || !amount) {
-      setError("Пожалуйста, заполните все поля");
+      setErrorMessage("Пожалуйста, заполните все поля");
       return;
     }
 
-    setLoading(true);
+    setIsLoading(true);
 
     try {
       await simulateApiCall();
       setPhoneNumber("");
       setAmount("");
     } catch (error) {
-      setError("Произошла ошибка при выполнении платежа");
+      setErrorMessage("Произошла ошибка при выполнении платежа");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -205,6 +192,11 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
 
   return (
     <>
+      <Head>
+        <title>NextOperators</title>
+        <meta name="description" content="test task for Brave Developers" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+      </Head>
       <Container>
         <BackgroundContainer style={{ color: `${color}` }}>
           {operator}
@@ -218,7 +210,7 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
             <InputLabel htmlFor="phoneNumber">Номер телефона:</InputLabel>
 
             <InputField
-              placeholder="7 (___) ___-__-__"
+              placeholder="+7 (ХХХ)-ХХХ-ХХ-ХХ"
               type="text"
               id="phoneNumber"
               value={phoneNumber}
@@ -237,14 +229,11 @@ const PaymentForm: React.FC<PaymentFormProps> = () => {
               required
             />
           </div>
-          <SubmitButton type="submit" disabled={loading}>
-            {loading ? <Loader /> : "Подтвердить"}
+          <SubmitButton type="submit" disabled={isLoading}>
+            {isLoading ? <Loader /> : "Подтвердить"}
           </SubmitButton>
         </PaymentFormStyle>
-        {error && <Message style={{ color: "red" }}>{error}</Message>}
-        {success && (
-          <Message style={{ color: "green" }}>Платеж успешно выполнен!</Message>
-        )}
+        <Alert isSuccess={isSuccess} errorMessage={errorMessage} />
       </Container>
     </>
   );

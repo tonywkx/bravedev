@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import styled, { keyframes } from "styled-components";
+import { operators } from "../Operators";
 
 const LogoAnimation = keyframes`
   from {
@@ -14,16 +15,15 @@ const LogoAnimation = keyframes`
 `;
 
 const Container = styled.div`
-  font-family: "Montserrat", sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100vh;
+  overflow-x: hidden;
 `;
 
 const Title = styled.h1`
-  font-family: "Montserrat", sans-serif;
   font-size: 50px;
   margin-bottom: 20px;
 `;
@@ -34,14 +34,14 @@ const OperatorButtons = styled.div`
 `;
 
 const OperatorButton = styled.button`
-  font-family: "Montserrat", sans-serif;
   position: relative;
   background-color: #f5f5f5;
   border: none;
   border-radius: 5px;
   color: #333;
   font-size: 16px;
-  padding: 10px 20px;
+  width: 160px;
+  height: 50px;
   margin: 0 10px;
   cursor: pointer;
 
@@ -57,7 +57,7 @@ const OperatorLogo = styled.img`
   position: absolute;
   top: 150px;
   left: 0;
-  transition: 0.5s;
+  transition: 0.5s ease top, 0.5s ease transform;
   transform: translateX(-50%);
   opacity: 0;
 `;
@@ -67,34 +67,27 @@ const MainScreen: React.FC = () => {
     <Container>
       <Title>Выберите оператора:</Title>
       <OperatorButtons>
-        <OperatorButton>
-          <OperatorLogo
-            className="operator-logo"
-            src="/mts-logo.png"
-            alt="mts"
-          />
-          <Link href="/payment?operator=МТС&color=red">Оплата МТС</Link>
-        </OperatorButton>
-        <OperatorButton>
-          <OperatorLogo
-            className="operator-logo"
-            src="/beeline-logo.png"
-            alt="beeline"
-          />
-          <Link href="/payment?operator=Билайн&color=yellow">
-            Оплата Билайн
-          </Link>
-        </OperatorButton>
-        <OperatorButton>
-          <OperatorLogo
-            className="operator-logo"
-            src="/megafon-logo.png"
-            alt="megfon"
-          />
-          <Link href="/payment?operator=Мегафон&color=green">
-            Оплата Мегафон
-          </Link>
-        </OperatorButton>
+        {operators.map((operator) => (
+          <OperatorButton key={operator.id}>
+            <OperatorLogo
+              className="operator-logo"
+              src={operator.img}
+              alt={operator.name}
+            />
+            <Link
+              style={{
+                display: "block",
+                width: "100%",
+                height: "100%",
+                textAlign: "center",
+                paddingTop: "12px",
+              }}
+              href={`/payment?operator=${operator.name}&color=${operator.color}`}
+            >
+              Оплата {operator.name}
+            </Link>
+          </OperatorButton>
+        ))}
       </OperatorButtons>
     </Container>
   );
