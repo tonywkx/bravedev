@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import styled, { keyframes } from "styled-components";
-import { operators } from "../Operators";
+import { OPERATORS } from "../../constants/operators";
 
 const LogoAnimation = keyframes`
   from {
@@ -67,26 +67,20 @@ const MainScreen: React.FC = () => {
     <Container>
       <Title>Выберите оператора:</Title>
       <OperatorButtons>
-        {operators.map((operator) => (
-          <OperatorButton key={operator.id}>
-            <OperatorLogo
-              className="operator-logo"
-              src={operator.img}
-              alt={operator.name}
-            />
-            <Link
-              style={{
-                display: "block",
-                width: "100%",
-                height: "100%",
-                textAlign: "center",
-                paddingTop: "12px",
-              }}
-              href={`/payment?operator=${operator.name}&color=${operator.color}`}
-            >
+        {OPERATORS.map((operator) => (
+          <Link
+            href={`/payment?operator=${operator.name}&color=${operator.color}`}
+            key={operator.id}
+          >
+            <OperatorButton>
+              <OperatorLogo
+                className="operator-logo"
+                src={operator.img}
+                alt={operator.name}
+              />
               Оплата {operator.name}
-            </Link>
-          </OperatorButton>
+            </OperatorButton>
+          </Link>
         ))}
       </OperatorButtons>
     </Container>

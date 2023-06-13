@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-import Head from "next/head";
 import styled, { keyframes } from "styled-components";
 import Alert from "@/components/Alert";
+import InputMask from "react-input-mask";
 
 const rotateAnimation = keyframes`
   from {
@@ -102,11 +102,11 @@ const SubmitButton = styled.button`
 `;
 
 const PaymentForm: React.FC = () => {
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [isSuccess, setIsSuccess] = useState<boolean>(false);
-  const [errorMessage, setErrorMessage] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [amount, setAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const router = useRouter();
   const { operator } = router.query;
@@ -192,11 +192,6 @@ const PaymentForm: React.FC = () => {
 
   return (
     <>
-      <Head>
-        <title>NextOperators</title>
-        <meta name="description" content="test task for Brave Developers" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
       <Container>
         <BackgroundContainer style={{ color: `${color}` }}>
           {operator}
@@ -209,7 +204,16 @@ const PaymentForm: React.FC = () => {
           <div>
             <InputLabel htmlFor="phoneNumber">Номер телефона:</InputLabel>
 
-            <InputField
+            <InputMask
+              style={{
+                width: "300px",
+                padding: "10px",
+                marginBottom: "10px",
+                color: "black",
+                zIndex: 10,
+                borderRadius: "5px",
+              }}
+              mask="+7 (999)-999-99-99"
               placeholder="+7 (ХХХ)-ХХХ-ХХ-ХХ"
               type="text"
               id="phoneNumber"
